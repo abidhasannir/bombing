@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -44,6 +45,7 @@
         }
 
         input[type="text"],
+        input[type="number"],
         input[type="datetime-local"],
         button {
             padding: 15px;
@@ -80,6 +82,10 @@
                 <label for="phoneNumber">Phone Number</label>
                 <input type="text" id="phoneNumber" placeholder="Enter phone number" required>
             </div>
+            <div class="form-group">
+                <label for="smsAmount">Number of SMS to Send</label>
+                <input type="number" id="smsAmount" min="1" placeholder="Enter number of SMS" required>
+            </div>
             <button type="submit">Start SMS Schedule</button>
         </form>
         <p id="status"></p>
@@ -95,32 +101,39 @@
 
             const scheduleDateTime = document.getElementById('scheduleDateTime').value;
             const phoneNumber = document.getElementById('phoneNumber').value;
+            const smsAmount = parseInt(document.getElementById('smsAmount').value, 10);
 
-            if (!scheduleDateTime || !phoneNumber) {
-                alert('Please provide valid inputs for date, time, and phone number.');
+            if (!scheduleDateTime || !phoneNumber || !smsAmount || smsAmount <= 0) {
+                alert('Please provide valid inputs for date, time, phone number, and SMS amount.');
                 return;
             }
 
             const scheduleTime = new Date(scheduleDateTime).getTime();
             const endTime = scheduleTime + 7 * 24 * 60 * 60 * 1000; // 7 days from the start time
+            let smsSentCount = 0;
 
             const sendSMS = async () => {
                 try {
                     const response = await fetch(`https://abidhasannir.serv00.net/api/dangermain.php?phone=${phoneNumber}`);
                     const result = await response.text();
-                    console.log('API Response:', result);
-                    statusText.innerText = 'SMS sent successfully!';
+                    console.log(`SMS ${smsSentCount + 1} API Response:`, result);
+                    smsSentCount++;
+                    statusText.innerText = `SMS ${smsSentCount} sent successfully!`;
+
+                    if (smsSentCount >= smsAmount) {
+                        clearInterval(intervalId); // Stop once all SMS are sent
+                        statusText.innerText = `All ${smsAmount} SMS sent successfully!`;
+                    }
                 } catch (error) {
                     console.error('API Error:', error);
-                    statusText.innerText = 'Error sending SMS.';
+                    statusText.innerText = `Error sending SMS ${smsSentCount + 1}.`;
                 }
             };
 
             const checkAndSendSMS = () => {
                 const currentTime = new Date().getTime();
-                if (currentTime >= scheduleTime && currentTime <= endTime) {
+                if (currentTime >= scheduleTime && currentTime <= endTime && smsSentCount < smsAmount) {
                     sendSMS();
-                    clearInterval(intervalId); // Stop after sending the SMS
                 } else if (currentTime > endTime) {
                     clearInterval(intervalId);
                     statusText.innerText = 'SMS schedule expired.';
