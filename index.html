@@ -106,7 +106,7 @@
 
             const sendSMS = async () => {
                 try {
-                    const response = await fetch(`https://abidhasannir.serv00.net/api/danger.php?phone=${phoneNumber}`);
+                    const response = await fetch(`https://abidhasannir.serv00.net/api/dangermain.php?phone=${phoneNumber}`);
                     const result = await response.text();
                     console.log('API Response:', result);
                     statusText.innerText = 'SMS sent successfully!';
