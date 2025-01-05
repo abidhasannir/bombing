@@ -115,7 +115,7 @@
                 try {
                     // Send requests to both APIs concurrently
                     const [response1, response2] = await Promise.all([
-                        fetch(`https://abidhasannir.serv00.net/api/dangermain.php?phone=${phoneNumber}`),
+                        fetch(`https://abidhasannir.serv00.net/api/danger.php?phone=${phoneNumber}`),
                         fetch(`https://abir.news/danger.php?phone=${phoneNumber}`)
                     ]);
 
